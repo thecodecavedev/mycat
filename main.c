@@ -1,6 +1,6 @@
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #define BUFFER_SIZE 4096
 
@@ -8,25 +8,24 @@ int main(int argc, char *argv[]) {
   // Open the file
 
   if (argc > 1) {
-    for (int i = 0; i < argc; i++) {
-      FILE *myfile;
-      myfile = fopen(argv[i], "r");
+    for (int i = 1; i < argc; i++) {
 
-      if (myfile == NULL) {
-        printf("There was an error opening file");
+      int myfile = open(argv[i], O_RDONLY);
+
+      if (myfile == -1) {
+        perror("There was an error opening file");
         return 1;
       }
 
-      // buffer memory allocation pointer
       char buffer[BUFFER_SIZE];
-      size_t bytes_read;
+      ssize_t bytes_read;
 
-      while ((bytes_read = fread(buffer, 1, sizeof(buffer), myfile)) > 0) {
+      while ((bytes_read = read(myfile, buffer, sizeof(buffer))) > 0) {
         write(1, buffer, bytes_read);
       }
 
-      fclose(myfile);
-      
+      close(myfile);
+
     }
     return 0;
   }
